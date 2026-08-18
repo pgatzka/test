@@ -1,0 +1,55 @@
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+    open-pull-requests-limit: 10
+    labels: ["dependencies", "java"]
+    commit-message:
+      prefix: "build(deps)"
+      prefix-development: "build(deps-dev)"
+    groups:
+      # One PR for the whole Spring Boot upgrade instead of a dozen interdependent ones.
+      spring-boot:
+        patterns:
+          - "org.springframework.boot:*"
+          - "org.springframework:*"
+      build-plugins:
+        patterns:
+          - "com.diffplug.spotless:*"
+          - "org.jacoco:*"
+          - "org.sonarsource.scanner.maven:*"
+          - "org.apache.maven.plugins:*"
+      test-libraries:
+        patterns:
+          - "org.testcontainers:*"
+          - "org.junit*:*"
+          - "org.mockito:*"
+          - "org.assertj:*"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+    labels: ["dependencies", "github-actions"]
+    commit-message:
+      prefix: "ci(deps)"
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    # Keeps the postgres image in docker-compose.yml current.
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+    labels: ["dependencies", "docker"]
+    commit-message:
+      prefix: "build(docker)"

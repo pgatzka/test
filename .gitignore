@@ -1,0 +1,21 @@
+target/
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+nbproject/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tooling caches
+.sonar/
+.scannerwork/
+*.log

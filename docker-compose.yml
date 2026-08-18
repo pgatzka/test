@@ -1,0 +1,54 @@
+# Local development stack.
+#
+#   1. Build the application image once:  mvn spring-boot:build-image -DskipTests
+#   2. Start everything:                  docker compose up
+#   3. Postgres only (for `mvn test`):    docker compose up -d postgres
+#
+# The image is produced by Paketo buildpacks via the Spring Boot Maven plugin, so
+# there is no Dockerfile to keep in sync with the build.
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: greeting-postgres
+    environment:
+      POSTGRES_DB: greeting
+      POSTGRES_USER: greeting
+      POSTGRES_PASSWORD: greeting
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U greeting -d greeting"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    image: ghcr.io/pgatzka/test:0.1.0-SNAPSHOT
+    container_name: greeting-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/greeting
+      SPRING_DATASOURCE_USERNAME: greeting
+      SPRING_DATASOURCE_PASSWORD: greeting
+      # Override the demo credentials before running this anywhere real.
+      APP_SECURITY_USER_PASSWORD: password
+      APP_SECURITY_ADMIN_PASSWORD: password
+      # Buildpack images size the heap from the container limit; this keeps startup lean.
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=75"
+    ports:
+      - "8080:8080"
+    healthcheck:
+      # The image is distroless-ish and has no curl, so probe from the JVM's own health endpoint
+      # using the Paketo image's bundled wget.
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8080/actuator/health | grep -q UP"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+volumes:
+  postgres-data:
