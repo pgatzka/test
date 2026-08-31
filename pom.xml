@@ -20,7 +20,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <!-- Plugin versions kept here so upgrades are a one-line change. -->
-    <spotless-maven-plugin.version>3.10.0</spotless-maven-plugin.version>
+    <spotless-maven-plugin.version>3.10.1</spotless-maven-plugin.version>
     <google-java-format.version>1.28.0</google-java-format.version>
     <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
     <sonar-maven-plugin.version>5.7.0.6970</sonar-maven-plugin.version>
